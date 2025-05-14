@@ -1,0 +1,10 @@
+docker pull registry.cn-hangzhou.aliyuncs.com/apifox/self-hosted-general-runner && ^
+docker run --name apifox_general_runner ^
+  -e TZ=Asia/Shanghai ^
+  -e SERVER_APP_BASE_URL=https://api.apifox.cn ^
+  -e TEAM_ID=2333708 ^
+  -e RUNNER_ID=7634 ^
+  -e ACCESS_TOKEN=TSHGR-YoH9Fy75M-4L5m6tH4nG9of4OmI7Kipo ^
+  -p 80:4524 ^
+  -v "C:\Program Files\apifox\Runner":/opt/runner ^
+  -d registry.cn-hangzhou.aliyuncs.com/apifox/self-hosted-general-runner
