@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Dome_project/SVG/playwright-python" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Dome_project/photo" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Dome_project/photo_1" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/basic-auto-test" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/one" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/one/idd-testing" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/one/idd-testing/Sunzi_auto_API" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/pytest-auto-api2" vcs="Git" />
+  </component>
+</project>

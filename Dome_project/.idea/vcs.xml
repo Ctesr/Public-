@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="$PROJECT_DIR$/ComfyUI" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/SVG/playwright-python" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/photo_1" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/playwright-python" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/vpype" vcs="Git" />
+  </component>
+</project>

@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iframe 嵌入优化示例</title>
+    <style>
+        /* 页面整体布局 */
+        .product-container {
+            display: flex;
+            gap: 20px;
+            width: 100%
+            max-width: 1100px;
+            align-items: center;      /* 垂直居中 */
+            margin: auto;
+            padding: 20px;
+            height: 80%
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+
+
+        /* 左侧产品图片区域 */
+        .product-images {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .main-image {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .thumbnail-slider {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            overflow-x: auto;
+        }
+
+        .thumbnail-slider img {
+            width: 60px;
+            height: 60px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .thumbnail-slider img:hover {
+            transform: scale(1.1);
+        }
+
+        /* 右侧产品信息 */
+        .product-details {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 产品标题 */
+        .product-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        /* 价格 */
+        .product-price {
+            font-size: 20px;
+            color: #d00;
+            font-weight: bold;
+        }
+
+        /* 折扣信息 */
+        .discount-info {
+            background: #ffebeb;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #d00;
+            margin-top: 5px;
+        }
+
+        /* 倒计时 */
+        .countdown-timer {
+            background: #ff9800;
+            color: white;
+            font-size: 16px;
+            padding: 5px 10px;
+            border-radius: 5px;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        /* 选择框架和颜色 */
+        .option-section {
+            margin-top: 20px;
+        }
+
+        .option-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .option-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .option-buttons button {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            background: white;
+            transition: background 0.3s;
+        }
+
+        .option-buttons button:hover,
+        .option-buttons .selected {
+            background: #ddd;
+        }
+
+        /* 额外选项 */
+        .extra-options {
+            margin-top: 15px;
+        }
+
+        .extra-options .option-card {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .extra-options .option-card:hover {
+            background: #f5f5f5;
+        }
+
+        /* 立即定制按钮 */
+        .customize-btn {
+            background: #e60012;
+            color: white;
+            font-size: 18px;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            margin-top: 20px;
+            transition: background 0.3s;
+        }
+
+        .customize-btn:hover {
+            background: #cc000f;
+        }
+
+        /* 追加：弹窗样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            position: relative;
+            width: 80%;
+            max-width: 1000px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            display: none;
+        }
+
+        /* 追加：iframe 样式 */
+        #iframe {
+            width: 100%;
+            height: 80vh;
+            border: none;
+        }
+        #prodlink-select {
+        width: 150px;
+        padding: 12px;
+        font-size: 16px;
+        border-radius: 8px;
+        border: 2px solid #ccc;
+        background-color: #f0f0f0;
+        }
+
+        #language-select {
+        width: 150px;
+        padding: 12px;
+        font-size: 16px;
+        border-radius: 8px;
+        border: 2px solid #ccc;
+        background-color: #f0f0f0;
+        }
+
+        /* 在较小屏幕上，增加 padding */
+        @media (max-width: 600px) {
+            #language-select {
+                font-size: 14px;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="product-container">
+        <!-- 左侧图片部分 -->
+        <div class="product-images">
+            <img src="https://oss-us-east.staticmeow.com/archive/designer/202535/c1d2418e-3aa5-412d-8b74-c397a687b215-1.webp" class="main-image" alt="Main Product Image">
+        </div>
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>我的页面标题</title> <!-- 设置页面的标题 -->
+        </head>
+        <!-- 右侧产品信息 -->
+        <div class="product-details">
+            <h1 class="product-title">CustoMeow</h1>
+            <p class="product-price">$19.95</p>
+
+            <select id="prodlink-select">
+                <option value="https://beta-customeow-api-client.maiyuan.online">BETA环境</option>
+                <option value="https://uat-customeow-api-client.maiyuan.online">UAT环境</option>
+                <option value="https://client.customeow.io">MASTER环境</option>
+            </select>
+
+            <select id="language-select">
+                <option value="en">英语</option>
+                <option value="zh-cn">中文</option>
+                <option value="vi">越南语</option>
+                <option value="es">西班牙语</option>
+                <option value="fr">法语</option>
+                <option value="de">德语</option>
+                <option value="it">意大利语</option>
+                <option value="ru">俄语</option>
+                <option value="ar">阿拉伯语</option>
+                <option value="zh-tw">繁体中文（台湾）</option>
+                <option value="th">泰语</option>
+                <option value="id">印尼语</option>
+                <option value="nl">荷兰语</option>
+                <option value="tr">土耳其语</option>
+                <option value="pt-br">巴西葡萄牙语</option>
+                <option value="he">希伯来语</option>
+                <option value="sv">瑞典语</option>
+                <option value="pl">波兰语</option>
+                <option value="pt-pt">葡萄牙语（葡萄牙）</option>
+                <option value="ko">韩语</option>
+                <option value="ja">日语</option>
+                <option value="el-gr">希腊语</option>
+                <option value="cs-cz">捷克语</option>
+            </select>
+
+            <div class="option-section">
+                <div class="option-title">选择变体：</div>
+                <div class="option-buttons">
+                    <button class="selected" data-sku="SKU-1">单文本</button>
+                    <button data-sku="SKU-2">传图</button>
+                    <button data-sku="SKU-4">预览传图</button>
+                    <button data-sku="SKU-3">预览文本</button>
+                    <button data-sku="SKU-5">3D预览</button>
+                    <button data-sku="SKU-6">SPU预览</button>
+                    <button data-sku="SKU-7">全组件</button>
+                    <button data-sku="SKU-8">随意功能</button>
+                </div>
+            </div>
+
+            <button class="customize-btn">立即定制</button>
+        </div>
+
+        <!-- 追加：弹窗容器 -->
+        <div id="iframe-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn">&times;</span>
+                <iframe id="iframe"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const customizeBtn = document.querySelector('.customize-btn');
+            const modal = document.getElementById('iframe-modal');
+            const closeBtn = document.querySelector('.close-btn');
+            const modalContent = document.querySelector('.modal-content');
+            const languageSelect = document.getElementById('language-select');
+            const prodlinkSelect = document.getElementById('prodlink-select');
+
+            let selectedSku = document.querySelector('.option-buttons .selected').dataset.sku;
+
+
+            // 定义环境配置对象
+            const envConfig = {
+                'https://beta-customeow-api-client.maiyuan.online': {
+                    apiUrl: 'https://api-go-beta-customeow.maiyuan.online',
+                    apiKey: '6f5aa03180eefbe2d13df5ce23e5981cda721ae0',
+                    storeId: '216512255225794561'
+                },
+                'https://uat-customeow-api-client.maiyuan.online': {
+                    apiUrl: 'https://api-go-uat-customeow.maiyuan.online',
+                    apiKey: 'd08d6526f063e0084eac4a9d18a99de81baed3ff',
+                    storeId: '217329578505416705'
+                },
+                'https://client.customeow.io': {
+                    apiUrl: '987654321098765432',
+                    apiKey: '987654321098765432',
+                    storeId: '987654321098765432'
+                }
+                // 更多环境配置可以继续添加
+            };
+
+            // 监听“立即定制”按钮点击
+            customizeBtn.addEventListener('click', function () {
+                const selectedLanguage = languageSelect.value; // 获取当前选择的语言
+                //console.log('Selected Language:', selectedLanguage); // 打印当前选中的语言
+                const prodlinkselect = prodlinkSelect.value;  // 获取当前环境
+                //console.log('Selected PROD:', prodlinkselect); // 打印当前环境
+
+                // 校验选中的环境是否在 envConfig 中
+                if (!envConfig.hasOwnProperty(prodlinkselect)) {
+                    // 如果选中的环境不在映射中，打印错误提示
+                    console.error(`Error: The selected environment '${prodlinkselect}' does not have a corresponding store ID.`);
+                    alert('Invalid environment selected. Please choose a valid environment.');
+                    return; // 终止执行后续代码
+                }
+
+
+                // 根据选中的环境获取对应的 storeId
+                const storeId = envConfig[prodlinkselect].storeId;
+
+                // 移除旧的 iframe（如果存在）
+                const oldIframe = document.getElementById('iframe');
+                if (oldIframe) {
+                    oldIframe.remove();
+                }
+
+                // 创建新的 iframe
+                const iframe = document.createElement('iframe');
+                iframe.id = 'iframe';
+
+                iframe.src = `${prodlinkselect}/${selectedLanguage}?sku=${selectedSku}&storeId=${storeId}&t=${Date.now()}`;
+                console.log('访问链接:', iframe.src)
+                // 将 iframe 插入弹窗内容
+                modalContent.appendChild(iframe);
+
+                // 显示弹窗
+                modal.style.display = 'flex';
+            });
+
+            // 监听关闭按钮点击
+            closeBtn.addEventListener('click', function () {
+                modal.style.display = 'none';
+
+                // 移除 iframe
+                const iframe = document.getElementById('iframe');
+                if (iframe) {
+                    iframe.remove();
+                }
+            });
+
+            // 监听弹窗外部点击
+            modal.addEventListener('click', function (event) {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+
+                    // 移除 iframe
+                    const iframe = document.getElementById('iframe');
+                    if (iframe) {
+                        iframe.remove();
+                    }
+                }
+            });
+
+            // 监听变体选择
+            document.querySelectorAll('.option-buttons button').forEach(button => {
+                button.addEventListener('click', function () {
+                    document.querySelectorAll('.option-buttons button').forEach(btn => btn.classList.remove('selected'));
+                    this.classList.add('selected');
+                    selectedSku = this.dataset.sku;
+                });
+            });
+        });
+
+
+        // 常量定义
+        const prodlinkSelect = document.getElementById('prodlink-select');
+        const prodlinkselect = prodlinkSelect.value;  // 获取当前环境
+        // console.log('API接口环境：', prodlinkselect)
+
+        const IFRAME_ORIGIN = {
+            BETA: 'https://beta-customeow-api-client.maiyuan.online',
+            UAT:'https://uat-customeow-api-client.maiyuan.online',
+            MASTER: 'https://client.customeow.io'
+        };
+
+        // console.log('A123：', IFRAME_ORIGIN[prodlinkselect])
+
+        const LOAD_TIMEOUT = 15000; // 15秒超时
+
+        // 元素引用
+        const elements = {
+            iframe: document.getElementById('iframe'),
+        };
+
+        // 安全的消息类型白名单
+        const ALLOWED_MESSAGE_TYPES = new Set([
+            'customeow:mount',
+            'customeow:confirm',
+            'customeow:close',
+            'customeow:error'
+        ]);
+
+        // 初始化事件监听
+        function initEventListeners() {
+            window.addEventListener('message', handleMessage);
+            elements.iframe.addEventListener('error', handleIframeError);
+        }
+
+        // 处理 iframe 消息
+        function handleMessage(event) {
+
+            const allowedOrigin = IFRAME_ORIGIN[prodlinkselect];
+
+            console.log('2222：', allowedOrigin)
+
+            if (ALLOWED_MESSAGE_TYPES.has(event.data.type)) {
+                console.log(`Received message: ${event.data.type}`, event.data);
+
+                switch (event.data.type) {
+                    case 'customeow:mount':
+                        handleMountEvent();
+                        break;
+                    case 'customeow:confirm':
+                        handleConfirmEvent(event.data);
+                        break;
+                    case 'customeow:close':
+                        handleCloseEvent();
+                        break;
+                    case 'customeow:error':
+                        handleErrorEvent();
+                        break;
+                }
+            }
+        }
+
+        // 错误处理
+        function handleIframeError() {
+            console.error('Iframe 加载失败');
+        }
+
+        // 处理自定义事件
+        function handleMountEvent() {
+            //console.log('Editor mounted');
+        }
+
+        // 处理 'customeow:close' 事件
+        function handleCloseEvent() {
+            console.log("Editor closed");
+            const iframe = document.getElementById('iframe');
+
+            const modal = document.getElementById('iframe-modal');
+            if (iframe) {
+                iframe.style.display = 'none'; // 隐藏 iframe
+            }
+            if (modal) {
+                modal.style.display = 'none'; // 隐藏模态框
+            }
+        }
+
+        // 处理 'customeow:error' 事件
+        function handleErrorEvent() {
+            console.log("An error occurred");
+            // 处理错误事件，例如显示错误提示或执行其他操作
+            alert("An error occurred in the editor.");
+        }
+
+
+        // 处理确认逻辑
+        function handleConfirmEvent(data) {
+            console.log('Confirm data:', data);
+
+            let selectedSku = document.querySelector('.option-buttons .selected').dataset.sku;
+            // console.log(selectedSku)
+
+            const prodlinkSelect = document.getElementById('prodlink-select');
+            const prodlinkselect = prodlinkSelect.value;  // 获取当前环境
+
+             // 定义环境配置对象
+            const envConfig = {
+                'https://beta-customeow-api-client.maiyuan.online': {
+                    apiUrl: 'https://api-go-beta-customeow.maiyuan.online',
+                    apiKey: '6f5aa03180eefbe2d13df5ce23e5981cda721ae0',
+                    storeId: '216512255225794561'
+                },
+                'https://uat-customeow-api-client.maiyuan.online': {
+                    apiUrl: 'https://api-go-uat-customeow.maiyuan.online',
+                    apiKey: 'd08d6526f063e0084eac4a9d18a99de81baed3ff',
+                    storeId: '217329578505416705'
+                },
+                'https://client.customeow.io': {
+                    apiUrl: '987654321098765432',
+                    apiKey: '987654321098765432',
+                    storeId: '987654321098765432'
+                }
+                // 更多环境配置可以继续添加
+            };
+
+
+             // 根据选中的环境获取对应的 storeId
+            const apiUrl = envConfig[prodlinkselect].apiUrl;
+            // 根据选中的环境获取对应的 storeId
+            const storeId = envConfig[prodlinkselect].storeId;
+            const apiKey = envConfig[prodlinkselect].apiKey;
+
+            // 生成动态订单数据
+            const platformOrderId = Date.now().toString(); // 生成唯一订单 ID
+            const platformOrderNo = "JC" + Math.floor(1000 + Math.random() * 9000); // 生成随机订单号
+            const platformCreatedAt = new Date().toISOString(); // ISO 格式时间
+
+
+            // 订单数据
+            const orderData = {
+                "storeId": storeId,
+                "platformOrderId": platformOrderId,
+                "platformOrderNo": platformOrderNo,
+                "platformCreatedAt": platformCreatedAt,
+                "lineItems": [
+                    {
+                        "sku": selectedSku,
+                        "customInfoId": "216973798006624256",
+                        "platformItemId": "62758597530",
+                        "platformProductId": "453695684",
+                        "platformProductTitle": "JC-PRODUCT",
+                        "platformVariantTitle": "Default",
+                        "platformVariantId": "6958596542",
+                        "platformProductImage": "https://oss-us-east.staticmeow.com/customeow/static/example/demo.jpg",
+                        "quantity": 1
+                    }
+                ]
+            };
+
+            // 调用创建订单接口
+            fetch( `${apiUrl}/open/v1/order`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-Api-Key": apiKey // 根据需求添加鉴权
+                },
+                body: JSON.stringify(orderData)
+            })
+                .then(response => response.json())
+                .then(result => {
+                    console.log("API 返回数据：", result);
+                    if (result.data.id) {
+                        console.log("订单创建成功", result);
+                        alert(`订单${platformOrderNo}创建成功！订单号：${result.data.id} `);
+                    } else {
+                        console.error("订单创建失败", result);
+                        alert("订单创建失败，请稍后重试");
+                    }
+                })
+                .catch(error => {
+                    console.error("订单请求失败", error);
+                    alert("网络错误，订单创建失败");
+                });
+        }
+
+
+        // 初始化
+        initEventListeners();
+    </script>
+</body>
+</html>

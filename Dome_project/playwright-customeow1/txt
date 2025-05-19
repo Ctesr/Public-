@@ -1,0 +1,6 @@
+pip install playwright   # 安装playwright
+playwright install   # 安装playwright的内置浏览器驱动
+
+python -m playwright install chromium  # 仅安装 Chromium
+python -m playwright install firefox   # 仅安装 Firefox
+python -m playwright install webkit    # 仅安装 WebKit

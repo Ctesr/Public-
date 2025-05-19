@@ -1,0 +1,38 @@
+{
+  "env_DEV":{
+  "env": "dev",
+  "base_url": "https://dev-customeow.maiyuan.online/zh-cn",
+  "headless": false,
+  "timeout": 30000,
+  "test_user": "",
+    "username": "fjc@idd.cool",
+    "password": "Aa123456!"
+},
+  "env_BETA":{
+  "env": "beta",
+  "base_url": "https://beta-customeow.maiyuan.online/zh-cn",
+  "headless": false,
+  "timeout": 30000,
+  "test_user": "",
+    "username": "fjc@idd.cool",
+    "password": "Aa123456!"
+},
+  "env_UAT":{
+  "env": "uat",
+  "base_url": "https://uat-customeow.maiyuan.online/zh-cn",
+  "headless": false,
+  "timeout": 30000,
+  "test_user": "",
+    "username": "fjc@idd.cool",
+    "password": "Aa123456!"
+},
+  "env_prod":{
+  "env": "master",
+  "base_url": "https://customeow.io/zh-cn",
+  "headless": false,
+  "timeout": 30000,
+  "test_user": "",
+    "username": "fjc@idd.cool",
+    "password": "Aa123456!"
+}}
+
